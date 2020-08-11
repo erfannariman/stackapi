@@ -1,4 +1,3 @@
-from sqlalchemy import create_engine
 from src.ssh import server
 from src.api import get_data
 # from src.functions import create_dataframe
@@ -25,4 +24,3 @@ engine.dispose()
 server.stop()
 
 print('finished')
-
