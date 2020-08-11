@@ -28,7 +28,7 @@ def upload_data(df, name, db_engine):
         con=db_engine,
         if_exists="replace",
         schema="method_usage",
-        index=False
+        index=False,
     )
 
 

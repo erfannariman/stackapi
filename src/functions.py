@@ -11,9 +11,9 @@ class MakeDataFrame:
         The answer part is a nested JSON itself.
         :return: two lists of dictionaries
         """
-        items = self.json['items']
+        items = self.json["items"]
         # we use pop, because we want to remove answers from the original dictionary
-        answers = [item.pop('answers', None) for item in items]
+        answers = [item.pop("answers", None) for item in items]
         questions = items
 
         return answers, questions
@@ -55,7 +55,7 @@ class MakeDataFrame:
         """
         questions = pd.DataFrame(questions)
         questions = self.get_user_id(questions)
-        questions['tags'] = questions['tags'].str.join(', ')
+        questions["tags"] = questions["tags"].str.join(", ")
 
         return questions
 
