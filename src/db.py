@@ -1,20 +1,14 @@
-from sqlalchemy import create_engine
-from src.ssh import server
+import os
 
+def auth_azure():
 
-def create_db_engine(user, pw, db_name):
-    engine = create_engine(
-        f'mysql+mysqldb://{user}:{pw}@127.0.0.1:{server.local_bind_port}',
-        echo=True
-    )
+    uid = os.environ.get('SQL_YELLOWSTACKS_DEV_USER')
+    password = os.environ.get('SQL_YELLOWSTACKS_DEV_PW')
+    server = 'yellowstacks-dev.database.windows.net'
+    database = 'landing'
+    driver = 'ODBC Driver 17 for SQL Server'
 
-    engine.execute('CREATE DATABASE IF NOT EXISTS Test_DB;')
-    engine.dispose()
+    connectionstring = f'mssql+pyodbc://{uid}:{password}@{server}:1433/{database}?driver={driver}'
 
-    engine = create_engine(
-        f'mysql+mysqldb://{user}:{pw}@127.0.0.1:{server.local_bind_port}/{db_name}',
-        encoding='utf-8',
-        echo=True
-    )
+    return connectionstring
 
-    return engine
