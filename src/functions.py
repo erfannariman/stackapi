@@ -71,17 +71,3 @@ class MakeDataFrame:
         }
 
         return dfs
-
-
-    # def string_encode(self):
-    #     self.df[self.cols] = self.df[self.cols].apply(
-    #         lambda x: x.str.encode(encoding="ascii", errors="replace")
-    #     )
-    #     return self.df
-    #
-    # def string_decode(self):
-    #     cols = self.df.select_dtypes(object).columns
-    #     self.df[cols] = self.df[cols].apply(
-    #         lambda x: x.str.decode(encoding="ascii", errors="replace")
-    #     )
-    #     return self.df
