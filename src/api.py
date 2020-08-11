@@ -9,12 +9,12 @@ def get_data():
     # !OfYUQY)-)L6xn6G_V_fwGSi-NmRjALbnnHtVSJYveQq
     # !17vW0QCdaXujT5YQfkhCM0wsVaCgMh(y41XVwBAXDRaS8D
     params = {
-      "order": "desc",
-      "sort": "creation",
-      "tagged": "pandas",
-      "site": "stackoverflow",
-      "filter": "!17vW0QCdaXujT5YQfkhCM0wsVaCgMh(y41XVwBAXDRaS8D"
-      }
+        "order": "desc",
+        "sort": "creation",
+        "tagged": "pandas",
+        "site": "stackoverflow",
+        "filter": "!17vW0QCdaXujT5YQfkhCM0wsVaCgMh(y41XVwBAXDRaS8D",
+    }
 
     request = requests.get(BASE_URL, params=params)
     json = request.json()
