@@ -1,26 +1,36 @@
-from src.ssh import server
+import logging
+
 from src.api import get_data
+# from src.parse_settings import get_settings
+from src.db import auth_azure
 # from src.functions import create_dataframe
 from src.functions import MakeDataFrame
-from src.parse_settings import get_settings
-from src.db import create_db_engine
+from src.log import set_logging
 
-SETTINGS = get_settings('settings.yml')
-DB_USER = SETTINGS['db_user']
-DB_PW = SETTINGS['db_pw']
-DB_NAME = SETTINGS['db_name']
 
-# server.daemon_forward_servers = True
-server.start()
+def pull_data():
+    logging.info('pulling data from Stack API...')
 
-engine = create_db_engine(DB_USER, DB_PW, DB_NAME)
+    json = get_data()
+    mkdf = MakeDataFrame(json)
+    df = mkdf.create_dataframe()
+    logging.info(f'imported {len(df)} records!')
 
-json = get_data()
-mkdf = MakeDataFrame(json)
-df = mkdf.create_dataframe()
-df.to_sql(name='test', con=engine, if_exists='replace', schema='Test_DB', index=False)
-engine.dispose()
+    return df
 
-server.stop()
 
-print('finished')
+def upload_data(df):
+    logging.info(f'uploading {len(df)} records to Azure...')
+    engn = auth_azure()
+    df.to_sql(name='pandas', con=engn, if_exists='replace', schema='method_usage', index=False)
+    logging.info('finished uploading!')
+
+
+def mainscript():
+    df = pull_data()
+    upload_data(df)
+
+
+if __name__ == '__main__':
+    set_logging()
+    mainscript()
