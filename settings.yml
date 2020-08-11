@@ -1,5 +1,7 @@
 # database info
+schema: method_usage
+method: append # append or replace
 
-db_user: root
-db_pw: Bricc3343
-db_name: Test_DB
+# project settings
+refresh: True
+upload: True

@@ -1,42 +1,28 @@
 import logging
-
-from src.api import get_data
-
-# from src.parse_settings import get_settings
-from src.db import auth_azure
-
-from src.functions import MakeDataFrame
+from src.api import pull_data
+from src.parse_settings import get_settings
 from src.log import set_logging
+from src.db import auth_azure, export_data
 
 
-def pull_data():
-    logging.info("pulling data from Stack API...")
-
-    json = get_data()
-    make_df = MakeDataFrame(json)
-    dfs = make_df.create_dataframes()
-    for name, df in dfs.items():
-        logging.info(f"imported {len(df)} {name} records!")
-
-    return dfs
-
-
-def upload_data(df, name, db_engine):
-    logging.info(f"uploading {name} to Azure with {len(df)} records...")
-    df.to_sql(
-        name=f"pandas_{name}",
-        con=db_engine,
-        if_exists="replace",
-        schema="method_usage",
-        index=False,
-    )
+settings = get_settings('settings.yml')
+REFRESH = settings['refresh']
+UPLOAD = settings['upload']
+METHOD = settings['method']
+SCHEMA = settings['schema']
 
 
 def run():
     dfs = pull_data()
-    db_engine = auth_azure()
-    for name, df in dfs.items():
-        upload_data(df, name, db_engine)
+    if UPLOAD:
+        for name, df in dfs.items():
+            export_data(
+                df=df,
+                name=name,
+                db_engine=auth_azure(),
+                method=METHOD,
+                schema=SCHEMA
+            )
     logging.info("finished uploading!")
 
 

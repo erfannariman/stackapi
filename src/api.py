@@ -1,4 +1,7 @@
 import requests
+import logging
+from src.functions import MakeDataFrame
+
 
 BASE_URL = "https://api.stackexchange.com/2.2/questions"
 
@@ -20,3 +23,15 @@ def get_data():
     json = request.json()
 
     return json
+
+
+def pull_data():
+    logging.info("pulling data from Stack API...")
+
+    json = get_data()
+    make_df = MakeDataFrame(json)
+    dfs = make_df.create_dataframes()
+    for name, df in dfs.items():
+        logging.info(f"imported {name} with {len(df)} records!")
+
+    return dfs

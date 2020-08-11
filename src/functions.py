@@ -42,7 +42,7 @@ class MakeDataFrame:
         :param answers: list of dictionaries
         :return: DataFrame
         """
-        answers = pd.concat(pd.DataFrame(x) for x in answers)
+        answers = pd.concat([pd.DataFrame(x) for x in answers], ignore_index=True)
         answers = self.get_user_id(answers)
 
         return answers
@@ -66,8 +66,8 @@ class MakeDataFrame:
         """
         answers, questions = self.split_json()
         dfs = {
-            "answers": self.answers(answers),
-            "questions": self.questions(questions),
+            "answer": self.answers(answers),
+            "question": self.questions(questions),
         }
 
         return dfs
