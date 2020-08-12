@@ -21,7 +21,7 @@ def auth_azure():
 def read_from_database(name, db_engine, schema):
     """
     :param name: name of table.
-    :param db_engine: connection string to database
+    :param db_engine: connection string to database.
     :param schema: schema name in database
     :return: list of id's that currently are stored in the Azure SQL database.
     """
