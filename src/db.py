@@ -21,31 +21,31 @@ def auth_azure():
 def read_from_database(name, db_engine, schema):
     """
     :param name: name of table.
-    :param db_engine: connection string to database
+    :param db_engine: connection string to database.
     :param schema: schema name in database
-    :return: list of question_id's that currently are stored in the Azure SQL database.
+    :return: list of id's that currently are stored in the Azure SQL database.
     """
 
     query = f"SELECT DISTINCT {name}_id FROM {schema}.pandas_{name};"
     id_list = pd.read_sql_query(query, con=db_engine)
-    logging.info(f"currently {len(id_list)} questions in database")
+    logging.info(f"currently {len(id_list)} {name}s in database")
 
     return id_list
 
 
 def determine_new_table(df, name, db_engine, schema):
     """
-    :param df: the extracted data set with questions from the stack exchange api.
+    :param df: the extracted data set with questions/answers from the stack exchange api.
     :param name: name of table.
     :param db_engine: connection string to database.
     :param schema: schema name in database
-    :return: datas et with only new questions that are not already stored in the database.
+    :return: dataset with only new questions/answers that are not already stored in the database.
     """
 
     id_list_db = read_from_database(name, db_engine, schema)
     df = df[~df[f"{name}_id"].isin(id_list_db[f"{name}_id"])].copy()
 
-    logging.info(f"{len(df)} new questions!")
+    logging.info(f"{len(df)} new {name}s!")
 
     return df
 
@@ -53,7 +53,7 @@ def determine_new_table(df, name, db_engine, schema):
 def export_data(df, name, db_engine, schema, method="append"):
     """
     Write data to database
-    :param df: data set with NEW questions.
+    :param df: data set with NEW records (either questions or answers).
     :param name: name of table.
     :param db_engine: connection string to database.
     :param schema: schema name in database
@@ -64,7 +64,9 @@ def export_data(df, name, db_engine, schema, method="append"):
     if method == "append":
         df = determine_new_table(df, name, db_engine, schema)
 
-    logging.info(f"doing {method} for table {name} with {len(df)} records to Azure...")
+    logging.info(
+        f"executing {method} for table {name} with {len(df)} records to Azure..."
+    )
     df["date_added"] = pd.to_datetime("now")
     df.to_sql(
         name=f"pandas_{name}",
@@ -73,4 +75,4 @@ def export_data(df, name, db_engine, schema, method="append"):
         schema=schema,
         index=False,
     )
-    logging.info(f"finished doing {method}!")
+    logging.info(f"finished executing {method}!")
