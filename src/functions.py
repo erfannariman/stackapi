@@ -44,6 +44,10 @@ class MakeDataFrame:
         """
         answers = pd.concat([pd.DataFrame(x) for x in answers], ignore_index=True)
         answers = self.get_user_id(answers)
+        date_cols = ["last_activity_date", "creation_date"]
+        answers[date_cols] = answers[date_cols].apply(
+            lambda x: pd.to_datetime(x, unit="s")
+        )
 
         return answers
 
@@ -56,6 +60,10 @@ class MakeDataFrame:
         questions = pd.DataFrame(questions)
         questions = self.get_user_id(questions)
         questions["tags"] = questions["tags"].str.join(", ")
+        date_cols = ["last_activity_date", "creation_date", "last_edit_date"]
+        questions[date_cols] = questions[date_cols].apply(
+            lambda x: pd.to_datetime(x, unit="s")
+        )
 
         return questions
 
