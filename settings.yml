@@ -1,6 +1,6 @@
 # database info
 schema: method_usage
-method: replace # append or replace, if table is new, use replace !
+method: append # append or replace, if table is new, use replace !
 
 # project settings
 refresh: True
