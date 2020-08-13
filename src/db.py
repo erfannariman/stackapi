@@ -55,7 +55,7 @@ def determine_new_table(df, name, db_engine, schema):
     return df
 
 
-def export_data(df, name, db_engine):
+def export_data(df, name, method):
     """
     Write data to database
     :param df: data set with NEW records (either questions or answers).
@@ -63,19 +63,30 @@ def export_data(df, name, db_engine):
     :param db_engine: connection string to database.
     :return: None
     """
+    db_engine = auth_azure()
 
-    if METHOD == "append":
+    if method == "append":
         df = determine_new_table(df, name, db_engine, SCHEMA)
 
-    logging.info(
-        f"executing {METHOD} for table {name} with {len(df)} records to Azure..."
-    )
+    logging.info(f"executing {method} on table '{name}' ({len(df)} records) to Azure")
     df["date_added"] = pd.to_datetime("now")
     df.to_sql(
         name=f"pandas_{name}",
         con=auth_azure(),
-        if_exists=METHOD,
+        if_exists=method,
         schema=SCHEMA,
         index=False,
     )
-    logging.info(f"finished executing {METHOD}!")
+    logging.info(f"finished executing {method}!")
+
+
+def export_dfs_to_azure(dfs, method):
+    """
+
+    :param dfs: dictionary of dataframe names (keys) and dataframes (values)
+    :return: uploads the dataframes with the given names to Azure SQL Server.
+    """
+
+    for name, df in dfs.items():
+        export_data(df=df, name=name, method=method)
+    logging.info("finished upload!")

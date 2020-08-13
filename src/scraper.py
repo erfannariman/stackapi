@@ -96,14 +96,9 @@ def run_scraper():
         "methods": methods,
     }
 
-    for name, df in dfs.items():
-        df.to_sql(
-            name=f"pandas_{name}",
-            con=auth_azure(),
-            if_exists="replace",
-            schema=get_settings(r"settings.yml")["schema"],
-            index=False,
-        )
+    logging.info("finished scraping pandas methods")
+
+    return dfs
 
 
 if __name__ == "__main__":
