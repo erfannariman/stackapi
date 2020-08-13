@@ -1,3 +1,6 @@
+# NOTE: this is an example settings file, duplicate this file and rename it to settings.yml
+# you can define your project settings in that file locally.
+
 # database info
 schema: method_usage
 method: append # append or replace, if table is new, use replace !
