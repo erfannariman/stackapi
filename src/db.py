@@ -12,8 +12,8 @@ def auth_azure():
 
     uid = os.environ.get("SQL_YELLOWSTACKS_DEV_USER")
     password = os.environ.get("SQL_YELLOWSTACKS_DEV_PW")
-    server = "yellowstacks-dev.database.windows.net"
-    database = "landing"
+    server = os.environ.get("SQL_YELLOWSTACKS_DEV_SERVER")
+    database = os.environ.get("SQL_YELLOWSTACKS_DEV_DB")
     driver = "ODBC Driver 17 for SQL Server"
 
     connection_string = (
