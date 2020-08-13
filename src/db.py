@@ -81,13 +81,14 @@ def export_data(df, name, method):
     )
     logging.info(f"finished executing {method}!")
 
+
 def export_dfs_to_azure(dfs, method):
-    '''
+    """
 
     :param dfs: dictionary of dataframe names (keys) and dataframes (values)
     :return: uploads the dataframes with the given names to Azure SQL Server.
-    '''
+    """
 
     for name, df in dfs.items():
-        export_data(df=df, name=name, method = method)
+        export_data(df=df, name=name, method=method)
     logging.info("finished upload!")
