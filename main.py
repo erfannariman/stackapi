@@ -14,9 +14,7 @@ def run():
 
     if settings["run_api"]:
         dfs = pull_data()
-        export_dfs_to_azure(
-            dfs, method="append"
-        )
+        export_dfs_to_azure(dfs, method="append")
 
 
 if __name__ == "__main__":
