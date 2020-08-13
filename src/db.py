@@ -69,7 +69,7 @@ def export_data(df, name, method):
         df = determine_new_table(df, name, db_engine, SCHEMA)
 
     logging.info(
-        f"executing {method} for table '{name}' with {len(df)} records to Azure..."
+        f"executing {method} on table '{name}' ({len(df)} records) to Azure"
     )
     df["date_added"] = pd.to_datetime("now")
     df.to_sql(
