@@ -8,7 +8,7 @@ from src.parse_settings import get_settings
 
 class Scraper:
     def __init__(self, page):
-        self.base_url = 'https://pandas.pydata.org/pandas-docs/stable/reference/'
+        self.base_url = "https://pandas.pydata.org/pandas-docs/stable/reference/"
         self.page = page
 
     def get_page(self):
@@ -29,13 +29,16 @@ class Scraper:
         if self.page == "index.html":
             # for links we do NOT want strings starting with "api"
             links = [
-                link.get("href") for link in a_tag
-                if not link.get("href").startswith("api") and "#" not in link.get("href")
+                link.get("href")
+                for link in a_tag
+                if not link.get("href").startswith("api")
+                and "#" not in link.get("href")
             ]
             # for methods we want the strings which start with "api"
         else:
             links = [
-                link.get("href") for link in a_tag
+                link.get("href")
+                for link in a_tag
                 if link.get("href").startswith("api") and "#" not in link.get("href")
             ]
 
@@ -51,8 +54,8 @@ class Scraper:
 
     @staticmethod
     def clean_up_methods(df):
-        df['methods'] = df['methods'].str.replace(r"api/|\.html", "")
-        df['methods'] = df["methods"].str.replace("pandas", "pd")
+        df["methods"] = df["methods"].str.replace(r"api/|\.html", "")
+        df["methods"] = df["methods"].str.replace("pandas", "pd")
 
         return df
 
@@ -67,7 +70,7 @@ class Scraper:
         links = self.get_links()
         df = pd.DataFrame({"methods": links})
         df = self.clean_up_methods(df)
-        df["page"] = self.page.split(r'.')[0]
+        df["page"] = self.page.split(r".")[0]
 
         return df
 
@@ -81,7 +84,7 @@ def run_scraper():
     # create methods df
     logging.info("started scraping pandas methods")
     dfs = []
-    for link in links['links']:
+    for link in links["links"]:
         logging.info(f"now scraping pandas method: {link.split(r'.')[0]}")
         scraper = Scraper(link)
         df = scraper.create_methods_df()
