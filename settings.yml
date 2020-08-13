@@ -3,5 +3,5 @@ schema: method_usage
 method: append # append or replace, if table is new, use replace !
 
 # project settings
-refresh: True
-upload: True
+get_pandas_methods: True
+run_api: False
