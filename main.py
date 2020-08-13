@@ -16,8 +16,7 @@ def run():
         dfs = pull_data()
         export_dfs_to_azure(
             dfs, method="append"
-        )  # in dit geval is de yaml niet echt handig:
-        # de method variabele is voor de scraper en de api kennelijk anders
+        )
 
 
 if __name__ == "__main__":
