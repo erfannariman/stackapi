@@ -48,6 +48,7 @@ class MakeDataFrame:
         answers[date_cols] = answers[date_cols].apply(
             lambda x: pd.to_datetime(x, unit="s")
         )
+        answers["body"] = answers.body.str.replace("<[^<]+?>", "")
 
         return answers
 
@@ -64,6 +65,7 @@ class MakeDataFrame:
         questions[date_cols] = questions[date_cols].apply(
             lambda x: pd.to_datetime(x, unit="s")
         )
+        questions["body"] = questions.body.str.replace("<[^<]+?>", "")
 
         return questions
 
