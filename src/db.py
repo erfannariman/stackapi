@@ -1,6 +1,11 @@
 import os
 import logging
 import pandas as pd
+from src.parse_settings import get_settings
+
+settings = get_settings("settings.yml")
+METHOD = settings["method"]
+SCHEMA = settings["schema"]
 
 
 def auth_azure():
@@ -50,29 +55,27 @@ def determine_new_table(df, name, db_engine, schema):
     return df
 
 
-def export_data(df, name, db_engine, schema, method="append"):
+def export_data(df, name, db_engine):
     """
     Write data to database
     :param df: data set with NEW records (either questions or answers).
     :param name: name of table.
     :param db_engine: connection string to database.
-    :param schema: schema name in database
-    :param method: should table be replaced or new data appended, choices [replace, append]
     :return: None
     """
 
-    if method == "append":
-        df = determine_new_table(df, name, db_engine, schema)
+    if METHOD == "append":
+        df = determine_new_table(df, name, db_engine, SCHEMA)
 
     logging.info(
-        f"executing {method} for table {name} with {len(df)} records to Azure..."
+        f"executing {METHOD} for table {name} with {len(df)} records to Azure..."
     )
     df["date_added"] = pd.to_datetime("now")
     df.to_sql(
         name=f"pandas_{name}",
-        con=db_engine,
-        if_exists=method,
-        schema=schema,
+        con=auth_azure(),
+        if_exists=METHOD,
+        schema=SCHEMA,
         index=False,
     )
-    logging.info(f"finished executing {method}!")
+    logging.info(f"finished executing {METHOD}!")
