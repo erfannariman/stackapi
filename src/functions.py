@@ -49,7 +49,6 @@ class MakeDataFrame:
         )
         answers = self.get_user_id(answers, "owner")
         date_cols = ["last_activity_date", "creation_date", "last_edit_date"]
-        
         answers[date_cols] = answers[date_cols].apply(
             lambda x: pd.to_datetime(x, unit="s", utc=True).dt.tz_convert(
                 "Europe/Amsterdam"
