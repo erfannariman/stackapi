@@ -17,7 +17,8 @@ def auth_azure():
     driver = "ODBC Driver 17 for SQL Server"
 
     connection_string = (
-        f"mssql+pyodbc://{uid}:{password}@{server}:1433/{database}?driver={driver}"
+        f"mssql+pyodbc://{uid}:{password}@"
+        f"{server}:1433/{database}?driver={driver}"
     )
 
     return connection_string
@@ -40,11 +41,11 @@ def read_from_database(name, db_engine, schema):
 
 def determine_new_table(df, name, db_engine, schema):
     """
-    :param df: the extracted data set with questions/answers from the stack exchange api.
+    :param df: extracted data set from the stack exchange api.
     :param name: name of table.
     :param db_engine: connection string to database.
     :param schema: schema name in database
-    :return: dataset with only new questions/answers that are not already stored in the database.
+    :return: df with only new data that's not already stored in the database.
     """
 
     id_list_db = read_from_database(name, db_engine, schema)
@@ -60,7 +61,7 @@ def export_data(df, name, method):
     Write data to database
     :param df: data set with NEW records (either questions or answers).
     :param name: name of table.
-    :param db_engine: connection string to database.
+    :param method: append or replace data in database.
     :return: None
     """
     db_engine = auth_azure()
@@ -68,7 +69,9 @@ def export_data(df, name, method):
     if method == "append":
         df = determine_new_table(df, name, db_engine, SCHEMA)
 
-    logging.info(f"executing {method} on table '{name}' ({len(df)} records) to Azure")
+    logging.info(
+        f"executing {method} on table '{name}' ({len(df)} records) to Azure"
+    )
     df["date_added"] = pd.to_datetime("now")
     df.to_sql(
         name=f"pandas_{name}",
@@ -82,8 +85,8 @@ def export_data(df, name, method):
 
 def export_dfs_to_azure(dfs, method):
     """
-
     :param dfs: dictionary of dataframe names (keys) and dataframes (values)
+    :param method: append or replace data in database.
     :return: uploads the dataframes with the given names to Azure SQL Server.
     """
 
