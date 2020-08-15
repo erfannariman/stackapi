@@ -31,8 +31,8 @@ class MakeDataFrame:
         return columns
 
     @staticmethod
-    def get_user_id(df):
-        df["owner"] = df["owner"].str["user_id"]
+    def get_user_id(df, col):
+        df[col] = df[col].str["user_id"]
 
         return df
 
@@ -43,7 +43,7 @@ class MakeDataFrame:
         :return: DataFrame
         """
         answers = pd.concat([pd.DataFrame(x) for x in answers], ignore_index=True)
-        answers = self.get_user_id(answers)
+        answers = self.get_user_id(answers, "owner")
         date_cols = ["last_activity_date", "creation_date"]
         answers[date_cols] = answers[date_cols].apply(
             lambda x: pd.to_datetime(x, unit="s")
@@ -59,7 +59,7 @@ class MakeDataFrame:
         :return: DataFrame
         """
         questions = pd.DataFrame(questions)
-        questions = self.get_user_id(questions)
+        questions = self.get_user_id(questions, "owner")
         questions["tags"] = questions["tags"].str.join(", ")
         date_cols = ["last_activity_date", "creation_date", "last_edit_date"]
         questions[date_cols] = questions[date_cols].apply(
