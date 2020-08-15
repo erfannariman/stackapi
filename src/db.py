@@ -72,7 +72,8 @@ def export_data(df, name, method):
     logging.info(
         f"executing {method} on table '{name}' ({len(df)} records) to Azure"
     )
-    df["date_added"] = pd.to_datetime("now")
+    df["date_added"] = pd.to_datetime("now").tz_localize("Europe/Amsterdam")
+
     df.to_sql(
         name=f"pandas_{name}",
         con=auth_azure(),
