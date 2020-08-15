@@ -12,7 +12,8 @@ class MakeDataFrame:
         :return: two lists of dictionaries
         """
         items = self.json["items"]
-        # we use pop, because we want to remove answers from the original dictionary
+        # we use pop, because we want to
+        # remove answers from the original dictionary
         answers = [item.pop("answers", None) for item in items]
         questions = items
 
