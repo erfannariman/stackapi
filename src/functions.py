@@ -42,7 +42,9 @@ class MakeDataFrame:
         :param answers: list of dictionaries
         :return: DataFrame
         """
-        answers = pd.concat([pd.DataFrame(x) for x in answers], ignore_index=True)
+        answers = pd.concat(
+            [pd.DataFrame(x) for x in answers], ignore_index=True
+        )
         answers = self.get_user_id(answers, "owner")
         date_cols = ["last_activity_date", "creation_date"]
         answers[date_cols] = answers[date_cols].apply(

@@ -16,9 +16,7 @@ def auth_azure():
     database = os.environ.get("SQL_YELLOWSTACKS_DEV_DB")
     driver = "ODBC Driver 17 for SQL Server"
 
-    connection_string = (
-        f"mssql+pyodbc://{uid}:{password}@{server}:1433/{database}?driver={driver}"
-    )
+    connection_string = f"mssql+pyodbc://{uid}:{password}@{server}:1433/{database}?driver={driver}"
 
     return connection_string
 
@@ -68,7 +66,9 @@ def export_data(df, name, method):
     if method == "append":
         df = determine_new_table(df, name, db_engine, SCHEMA)
 
-    logging.info(f"executing {method} on table '{name}' ({len(df)} records) to Azure")
+    logging.info(
+        f"executing {method} on table '{name}' ({len(df)} records) to Azure"
+    )
     df["date_added"] = pd.to_datetime("now")
     df.to_sql(
         name=f"pandas_{name}",

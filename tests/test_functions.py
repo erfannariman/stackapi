@@ -24,9 +24,9 @@ def test_select_string_columns():
 
 
 def test_get_user_id():
-    df = pd.DataFrame({
-        "owner": [{"user_id": 123}, {"user_id": 456}, {"user_id": 789}]
-    })
+    df = pd.DataFrame(
+        {"owner": [{"user_id": 123}, {"user_id": 456}, {"user_id": 789}]}
+    )
     expected = pd.DataFrame({"owner": [123, 456, 789]})
     result = make_df.get_user_id(df, "owner")
     tm.assert_frame_equal(expected, result)
