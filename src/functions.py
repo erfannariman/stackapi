@@ -50,9 +50,7 @@ class MakeDataFrame:
         answers = self.get_user_id(answers, "owner")
         date_cols = ["last_activity_date", "creation_date", "last_edit_date"]
         answers[date_cols] = answers[date_cols].apply(
-            lambda x: pd.to_datetime(x, unit="s", utc=True).dt.tz_convert(
-                "Europe/Amsterdam"
-            )
+            lambda x: pd.to_datetime(x, unit="s", utc=True)
         )
         answers["body"] = answers.body.str.replace("<[^<]+?>", "")
 
@@ -69,9 +67,7 @@ class MakeDataFrame:
         questions["tags"] = questions["tags"].str.join(", ")
         date_cols = ["last_activity_date", "creation_date", "last_edit_date"]
         questions[date_cols] = questions[date_cols].apply(
-            lambda x: pd.to_datetime(x, unit="s", utc=True).dt.tz_convert(
-                "Europe/Amsterdam"
-            )
+            lambda x: pd.to_datetime(x, unit="s", utc=True)
         )
         questions["body"] = questions.body.str.replace("<[^<]+?>", "")
 
