@@ -2,8 +2,13 @@ import os
 import logging
 import pandas as pd
 from src.parse_settings import get_settings
+from sqlalchemy import create_engine
+from sqlalchemy.sql import text
 
-settings = get_settings("settings.yml")
+try:
+    settings = get_settings("settings.yml")
+except FileNotFoundError:
+    settings = get_settings("settings_template.yml")
 METHOD = settings["method"]
 SCHEMA = settings["schema"]
 
@@ -17,11 +22,12 @@ def auth_azure():
     driver = "ODBC Driver 17 for SQL Server"
 
     connection_string = (
-        f"mssql+pyodbc://{uid}:{password}@"
-        f"{server}:1433/{database}?driver={driver}"
+        f"mssql+pyodbc://{uid}:{password}@" f"{server}:1433/{database}?driver={driver}"
     )
 
-    return connection_string
+    engine = create_engine(connection_string)
+
+    return engine
 
 
 def read_from_database(name, db_engine, schema):
@@ -56,6 +62,15 @@ def determine_new_table(df, name, db_engine, schema):
     return df
 
 
+def execute_sql_file(sql_file):
+    engine = auth_azure()
+    connection = engine.connect()
+
+    file = open(os.path.join("src", "models", sql_file))
+    query = text(file.read())
+    connection.execute(query)
+
+
 def export_data(df, name, method):
     """
     Write data to database
@@ -76,11 +91,7 @@ def export_data(df, name, method):
     df["date_added"] = pd.to_datetime("now")
 
     df.to_sql(
-        name=f"pandas_{name}",
-        con=auth_azure(),
-        if_exists=method,
-        schema=SCHEMA,
-        index=False,
+        name=f"pandas_{name}", con=auth_azure(), if_exists=method, schema=SCHEMA, index=False,
     )
     logging.info(f"finished executing {method}!")
 
