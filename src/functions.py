@@ -158,10 +158,10 @@ class MethodCounts:
     def method_counts_to_db(self):
         dfs = self.create_method_count_tables()
         logging.info("Writing results method counts to db")
-        execute_sql_file("method_counts.sql")
         for name, df in dfs.items():
+            execute_sql_file(f"method_counts_{name}.sql")
             df.to_sql(
-                name="method_counts",
+                name=f"method_counts_{name}",
                 con=auth_azure(),
                 if_exists="append",  # TODO: should this be replace or ..?
                 schema=SCHEMA,
