@@ -2,6 +2,8 @@ import os
 import logging
 import pandas as pd
 from src.parse_settings import get_settings
+from sqlalchemy import create_engine
+from sqlalchemy.sql import text
 
 settings = get_settings("settings.yml")
 METHOD = settings["method"]
@@ -21,7 +23,9 @@ def auth_azure():
         f"{server}:1433/{database}?driver={driver}"
     )
 
-    return connection_string
+    engine = create_engine(connection_string)
+
+    return engine
 
 
 def read_from_database(name, db_engine, schema):
@@ -54,6 +58,15 @@ def determine_new_table(df, name, db_engine, schema):
     logging.info(f"{len(df)} new {name}s!")
 
     return df
+
+
+def execute_sql_file(sql_file):
+    engine = auth_azure()
+    connection = engine.connect()
+
+    file = open(os.path.join("src", "models", sql_file))
+    query = text(file.read())
+    connection.execute(query)
 
 
 def export_data(df, name, method):
