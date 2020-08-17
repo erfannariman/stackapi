@@ -3,7 +3,10 @@ from src.db import auth_azure
 from src.parse_settings import get_settings
 import logging
 
-settings = get_settings("settings.yml")
+try:
+    settings = get_settings("settings.yml")
+except FileNotFoundError:
+    settings = get_settings("settings_template.yml")
 SCHEMA = settings["schema"]
 MODULE = settings["module"]
 
