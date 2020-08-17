@@ -1,4 +1,11 @@
 import pandas as pd
+from src.db import auth_azure
+from src.parse_settings import get_settings
+import logging
+
+settings = get_settings("settings.yml")
+SCHEMA = settings["schema"]
+MODULE = settings["module"]
 
 
 class MakeDataFrame:
@@ -85,3 +92,76 @@ class MakeDataFrame:
         }
 
         return dfs
+
+
+class MethodCounts:
+    def __init__(self):
+        logging.info("Starting method count analysis on data")
+        self.engine = auth_azure()
+        # TODO: this should be done dynamically for each module
+        self.tables = [f'{MODULE}_methods', f'{MODULE}_answer', f'{MODULE}_question']
+        logging.info("Reading in tables from db for method counts")
+        self.dfs = {
+            table: pd.read_sql_table(
+                table, con=self.engine, schema='method_usage'
+            ) for table in self.tables
+        }
+        self.to_replace = [
+            r'pd',
+            r'.Series',
+            r'.DataFrame',
+            r'.DatetimeIndex',
+            r'.Index',
+            r'.Timedelta',
+            r'.IntervalIndex',
+            r'.MultiIndex',
+            r'.CategoricalIndex',
+            r'.Timestamp',
+            r'.Period',
+            r'.core.groupby.GroupBy',
+            r'.core.groupbyGroupBy'
+        ]
+
+    def methods(self):
+        methods = self.dfs[f'{MODULE}_methods']
+        methods['methods'] = methods['methods'].str.replace('|'.join(self.to_replace), '')
+        df_methods = methods[methods['methods'].str.len().ne(0)]
+        methods = '|'.join(df_methods['methods'])
+
+        return methods
+
+    def method_count(self, df):
+        matches = df["body"].str.extractall(f"({self.methods()})")
+        matches = matches[matches[0].str.startswith(".")]
+        matches = matches.value_counts()
+        matches = matches.reset_index(name="count").rename(columns={0: "method"})
+        matches["module"] = MODULE
+        matches["module"] = pd.to_datetime("now", utc=True)
+
+        return matches
+
+    def create_method_count_tables(self):
+        dfs = self.dfs
+        qa = {
+            "question": dfs[f"{MODULE}_question"],
+            "answer": dfs[f"{MODULE}_answer"],
+        }
+        logging.info("Doing method count analysis on tables")
+        method_counts = {
+            name: self.method_count(df) for name, df in qa.items()
+        }
+        logging.info("Finished method count analysis")
+        return method_counts
+
+    def method_counts_to_db(self):
+        dfs = self.create_method_count_tables()
+        logging.info("Writing results method counts to db")
+        for name, df in dfs.items():
+            df.to_sql(
+                name="method_counts",
+                con=auth_azure(),
+                if_exists="replace",  # TODO: should this be replace or ..?
+                schema=SCHEMA,
+                index=False,
+            )
+        logging.info("Finished writing result method counts to db")
