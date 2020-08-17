@@ -19,7 +19,7 @@ def run():
 
     if settings["method_count"]:
         method_counts = MethodCounts()
-        method_counts.create_method_count_tables()
+        method_counts.method_counts_to_db()
 
 
 if __name__ == "__main__":

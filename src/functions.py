@@ -1,7 +1,8 @@
 import pandas as pd
-from src.db import auth_azure
+from src.db import auth_azure, execute_sql_file
 from src.parse_settings import get_settings
 import logging
+import os
 
 try:
     settings = get_settings("settings.yml")
@@ -138,9 +139,9 @@ class MethodCounts:
         matches = df["body"].str.extractall(f"({self.methods()})")
         matches = matches[matches[0].str.startswith(".")]
         matches = matches.value_counts()
-        matches = matches.reset_index(name="count").rename(columns={0: "method"})
+        matches = matches.reset_index(name="count").rename(columns={0: "methods"})
         matches["module"] = MODULE
-        matches["module"] = pd.to_datetime("now", utc=True)
+        matches["date_added"] = pd.to_datetime("now", utc=True)
 
         return matches
 
@@ -158,11 +159,12 @@ class MethodCounts:
     def method_counts_to_db(self):
         dfs = self.create_method_count_tables()
         logging.info("Writing results method counts to db")
+        execute_sql_file("method_counts.sql")
         for name, df in dfs.items():
             df.to_sql(
                 name="method_counts",
                 con=auth_azure(),
-                if_exists="replace",  # TODO: should this be replace or ..?
+                if_exists="append",  # TODO: should this be replace or ..?
                 schema=SCHEMA,
                 index=False,
             )
