@@ -2,8 +2,6 @@ import logging
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-from src.db import auth_azure
-from src.parse_settings import get_settings
 
 
 class Scraper:
@@ -31,8 +29,7 @@ class Scraper:
             links = [
                 link.get("href")
                 for link in a_tag
-                if not link.get("href").startswith("api")
-                and "#" not in link.get("href")
+                if not link.get("href").startswith("api") and "#" not in link.get("href")
             ]
             # for methods we want the strings which start with "api"
         else:

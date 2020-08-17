@@ -5,6 +5,11 @@
 schema: method_usage
 method: append # append or replace, if table is new, use replace !
 
+# which module to analyze
+# TODO: functionality to analyze multiple modules
+module: pandas
+
 # project settings
 get_pandas_methods: True
 run_api: False
+method_count: True
