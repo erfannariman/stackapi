@@ -44,6 +44,7 @@ def read_from_database(name, db_engine, schema):
 
     return id_list
 
+
 def delete_current_records(df, name):
     """
     :param df: new records
