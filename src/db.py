@@ -45,6 +45,62 @@ def read_from_database(name, db_engine, schema):
     return id_list
 
 
+def delete_current_records(df, name):
+    """
+    :param df: new records
+    :param name: name of the table
+    :return: executes a delete statement in Azure SQL for the new records.
+    """
+
+    del_list = get_overlapping_records(df, name)
+    stmt = create_sql_delete_stmt(del_list, name)
+
+    if len(del_list):
+        execute_stmt(stmt)
+    else:
+        logging.info("skip deleting. no records in delete statement")
+
+
+def get_overlapping_records(df, name):
+    """
+    :param df: the dataframe containing new records
+    :param name: the name of the table
+    :return:  a list of records that are overlapping
+    """
+
+    current_db = read_from_database(name, db_engine=auth_azure(), schema="method_usage")
+    overlapping_records = current_db[current_db[f"{name}_id"].isin(df[f"{name}_id"])]
+    del_list = overlapping_records.astype(str)[f"{name}_id"].to_list()
+
+    return del_list
+
+
+def create_sql_delete_stmt(del_list, name):
+    """
+    :param del_list: list of records that need to be formatted in SQL delete statement.
+    :param name: the name of the table
+    :return: SQL statement for deleting the specific records
+    """
+    sql_list = ", ".join(del_list)
+    sql_stmt = f"DELETE FROM method_usage.pandas_{name} WHERE {name}_id IN ({sql_list})"
+    logging.info(f"{len(del_list)} {name} in delete statement")
+
+    return sql_stmt
+
+
+def execute_stmt(stmt):
+    """
+    :param stmt: SQL statement to be executed
+    :return: executes the statment
+    """
+    engn = auth_azure()
+
+    with engn.connect() as con:
+        rs = con.execute(stmt)
+
+    return rs
+
+
 def determine_new_table(df, name, db_engine, schema):
     """
     :param df: extracted data set from the stack exchange api.
@@ -79,10 +135,8 @@ def export_data(df, name, method):
     :param method: append or replace data in database.
     :return: None
     """
-    db_engine = auth_azure()
-
     if method == "append":
-        df = determine_new_table(df, name, db_engine, SCHEMA)
+        delete_current_records(df, name)
 
     if not len(df):
         return logging.info(f"skipped upload of table {name}.(0 records)")

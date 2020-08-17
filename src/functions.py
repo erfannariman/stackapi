@@ -150,7 +150,7 @@ class MethodCounts:
             "question": dfs[f"{MODULE}_question"],
             "answer": dfs[f"{MODULE}_answer"],
         }
-        logging.info("Doing method count analysis on tables")
+        logging.info("Executing method count analysis on tables")
         method_counts = {name: self.method_count(df) for name, df in qa.items()}
         logging.info("Finished method count analysis")
         return method_counts
