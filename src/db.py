@@ -5,7 +5,10 @@ from src.parse_settings import get_settings
 from sqlalchemy import create_engine
 from sqlalchemy.sql import text
 
-settings = get_settings("settings.yml")
+try:
+    settings = get_settings("settings.yml")
+except FileNotFoundError:
+    settings = get_settings("settings_template.yml")
 METHOD = settings["method"]
 SCHEMA = settings["schema"]
 
