@@ -6,9 +6,7 @@ import pandas as pd
 
 class Scraper:
     def __init__(self, page):
-        self.base_url = (
-            "https://pandas.pydata.org/pandas-docs/stable/reference/"
-        )
+        self.base_url = "https://pandas.pydata.org/pandas-docs/stable/reference/"
         self.page = page
 
     def get_page(self):
@@ -39,8 +37,7 @@ class Scraper:
             links = [
                 link.get("href")
                 for link in a_tag
-                if link.get("href").startswith("api")
-                and "#" not in link.get("href")
+                if link.get("href").startswith("api") and "#" not in link.get("href")
             ]
 
         return links
