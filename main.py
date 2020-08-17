@@ -3,6 +3,7 @@ from src.log import set_logging
 from src.parse_settings import get_settings
 from src.scraper import run_scraper
 from src.db import export_dfs_to_azure
+from src.functions import MethodCounts
 
 settings = get_settings("settings.yml")
 
@@ -15,6 +16,10 @@ def run():
     if settings["run_api"]:
         dfs = pull_data()
         export_dfs_to_azure(dfs, method="append")
+
+    if settings["method_count"]:
+        method_counts = MethodCounts()
+        method_counts.create_method_count_tables()
 
 
 if __name__ == "__main__":
