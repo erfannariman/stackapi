@@ -17,8 +17,7 @@ def auth_azure():
     driver = "ODBC Driver 17 for SQL Server"
 
     connection_string = (
-        f"mssql+pyodbc://{uid}:{password}@"
-        f"{server}:1433/{database}?driver={driver}"
+        f"mssql+pyodbc://{uid}:{password}@" f"{server}:1433/{database}?driver={driver}"
     )
 
     return connection_string
@@ -70,17 +69,13 @@ def export_data(df, name, method):
         df = determine_new_table(df, name, db_engine, SCHEMA)
 
     if not len(df):
-        return logging.info(f'skipped upload of table {name}.(0 records)')
+        return logging.info(f"skipped upload of table {name}.(0 records)")
 
     logging.info(f"executing {method} on table '{name}' ({len(df)} records) to Azure")
     df["date_added"] = pd.to_datetime("now")
 
     df.to_sql(
-        name=f"pandas_{name}",
-        con=auth_azure(),
-        if_exists=method,
-        schema=SCHEMA,
-        index=False,
+        name=f"pandas_{name}", con=auth_azure(), if_exists=method, schema=SCHEMA, index=False,
     )
     logging.info(f"finished executing {method}!")
 
