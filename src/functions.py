@@ -54,9 +54,7 @@ class MakeDataFrame:
         :return: DataFrame
         """
 
-        answers = pd.concat(
-            [pd.DataFrame(x) for x in answers], ignore_index=True
-        )
+        answers = pd.concat([pd.DataFrame(x) for x in answers], ignore_index=True)
         answers = self.get_user_id(answers, "owner")
         date_cols = ["last_activity_date", "creation_date", "last_edit_date"]
         answers[date_cols] = answers[date_cols].apply(
@@ -109,9 +107,7 @@ class MethodCounts:
         ]
         logging.info("Reading in tables from db for method counts")
         self.dfs = {
-            table: pd.read_sql_table(
-                table, con=self.engine, schema="method_usage"
-            )
+            table: pd.read_sql_table(table, con=self.engine, schema="method_usage")
             for table in self.tables
         }
         self.to_replace = [
@@ -132,9 +128,7 @@ class MethodCounts:
 
     def methods(self):
         methods = self.dfs[f"{MODULE}_methods"]
-        methods["methods"] = methods["methods"].str.replace(
-            "|".join(self.to_replace), ""
-        )
+        methods["methods"] = methods["methods"].str.replace("|".join(self.to_replace), "")
         df_methods = methods[methods["methods"].str.len().ne(0)]
         methods = "|".join(df_methods["methods"])
 
@@ -144,9 +138,7 @@ class MethodCounts:
         matches = df["body"].str.extractall(f"({self.methods()})")
         matches = matches[matches[0].str.startswith(".")]
         matches = matches.value_counts()
-        matches = matches.reset_index(name="count").rename(
-            columns={0: "method"}
-        )
+        matches = matches.reset_index(name="count").rename(columns={0: "method"})
         matches["module"] = MODULE
         matches["module"] = pd.to_datetime("now", utc=True)
 
@@ -159,9 +151,7 @@ class MethodCounts:
             "answer": dfs[f"{MODULE}_answer"],
         }
         logging.info("Doing method count analysis on tables")
-        method_counts = {
-            name: self.method_count(df) for name, df in qa.items()
-        }
+        method_counts = {name: self.method_count(df) for name, df in qa.items()}
         logging.info("Finished method count analysis")
         return method_counts
 
