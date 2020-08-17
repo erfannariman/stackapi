@@ -2,7 +2,6 @@ import pandas as pd
 from src.db import auth_azure, execute_sql_file
 from src.parse_settings import get_settings
 import logging
-import os
 
 try:
     settings = get_settings("settings.yml")
