@@ -1,21 +1,22 @@
 import requests
 import logging
 from src.functions import MakeDataFrame
+from src.parse_settings import get_settings
 
-
+tag = get_settings("settings.yml")["module"]
 BASE_URL = "https://api.stackexchange.com/2.2/questions"
 
 
 def get_data():
+    """
+    Retrieve data from certain tag from stackexchange
+    :return: json with answers and questions
+    """
 
-    # filters:
-    # !OfYUQY)-)L6xn6G_V_fwGSi-NmRjALbnnHtVSJYveQq
-    # !17vW0QCdaXujT5YQfkhCM0wsVaCgMh(y41XVwBAXDRaS8D <-- without link
-    # !17vW0QCdaXujT5YQflD_sS_8ZjSYTT51wvIeyoJW0JSm4D
     params = {
         "order": "desc",
         "sort": "creation",
-        "tagged": "pandas",
+        "tagged": tag,
         "site": "stackoverflow",
         "filter": "!17vW0QCdaXujT5YQflD_sS_8ZjSYTT51wvIeyoJW0JSm4D",
     }
@@ -27,6 +28,10 @@ def get_data():
 
 
 def pull_data():
+    """
+    Convert json retrieved from API to pandas dataframes.
+    :return: dictionary with answers and questions dataframes.
+    """
     logging.info("pulling data from Stack API...")
 
     json = get_data()
