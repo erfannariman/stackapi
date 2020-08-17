@@ -99,34 +99,41 @@ class MethodCounts:
         logging.info("Starting method count analysis on data")
         self.engine = auth_azure()
         # TODO: this should be done dynamically for each module
-        self.tables = [f'{MODULE}_methods', f'{MODULE}_answer', f'{MODULE}_question']
+        self.tables = [
+            f"{MODULE}_methods",
+            f"{MODULE}_answer",
+            f"{MODULE}_question",
+        ]
         logging.info("Reading in tables from db for method counts")
         self.dfs = {
             table: pd.read_sql_table(
-                table, con=self.engine, schema='method_usage'
-            ) for table in self.tables
+                table, con=self.engine, schema="method_usage"
+            )
+            for table in self.tables
         }
         self.to_replace = [
-            r'pd',
-            r'.Series',
-            r'.DataFrame',
-            r'.DatetimeIndex',
-            r'.Index',
-            r'.Timedelta',
-            r'.IntervalIndex',
-            r'.MultiIndex',
-            r'.CategoricalIndex',
-            r'.Timestamp',
-            r'.Period',
-            r'.core.groupby.GroupBy',
-            r'.core.groupbyGroupBy'
+            r"pd",
+            r".Series",
+            r".DataFrame",
+            r".DatetimeIndex",
+            r".Index",
+            r".Timedelta",
+            r".IntervalIndex",
+            r".MultiIndex",
+            r".CategoricalIndex",
+            r".Timestamp",
+            r".Period",
+            r".core.groupby.GroupBy",
+            r".core.groupbyGroupBy",
         ]
 
     def methods(self):
-        methods = self.dfs[f'{MODULE}_methods']
-        methods['methods'] = methods['methods'].str.replace('|'.join(self.to_replace), '')
-        df_methods = methods[methods['methods'].str.len().ne(0)]
-        methods = '|'.join(df_methods['methods'])
+        methods = self.dfs[f"{MODULE}_methods"]
+        methods["methods"] = methods["methods"].str.replace(
+            "|".join(self.to_replace), ""
+        )
+        df_methods = methods[methods["methods"].str.len().ne(0)]
+        methods = "|".join(df_methods["methods"])
 
         return methods
 
@@ -134,7 +141,9 @@ class MethodCounts:
         matches = df["body"].str.extractall(f"({self.methods()})")
         matches = matches[matches[0].str.startswith(".")]
         matches = matches.value_counts()
-        matches = matches.reset_index(name="count").rename(columns={0: "method"})
+        matches = matches.reset_index(name="count").rename(
+            columns={0: "method"}
+        )
         matches["module"] = MODULE
         matches["module"] = pd.to_datetime("now", utc=True)
 
