@@ -84,6 +84,9 @@ def export_data(df, name, method):
     if method == "append":
         df = determine_new_table(df, name, db_engine, SCHEMA)
 
+    if not len(df):
+        return logging.info(f"skipped upload of table {name}.(0 records)")
+
     logging.info(f"executing {method} on table '{name}' ({len(df)} records) to Azure")
     df["date_added"] = pd.to_datetime("now")
 
@@ -102,4 +105,5 @@ def export_dfs_to_azure(dfs, method):
 
     for name, df in dfs.items():
         export_data(df=df, name=name, method=method)
+
     logging.info("finished upload!")
