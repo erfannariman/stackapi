@@ -4,10 +4,12 @@ from src.parse_settings import get_settings
 from src.scraper import run_scraper
 from src.db import export_dfs_to_azure
 from src.functions import MethodCounts
+from src.git import git_push
 from datetime import datetime
 import logging
 
 settings = get_settings("settings.yml")
+push = True
 
 
 def run():
@@ -22,6 +24,9 @@ def run():
     if settings["method_count"]:
         method_counts = MethodCounts()
         method_counts.method_counts_to_db()
+
+    if push:
+        git_push()
 
 
 if __name__ == "__main__":

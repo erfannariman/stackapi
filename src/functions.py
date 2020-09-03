@@ -159,6 +159,9 @@ class MethodCounts:
         dfs = self.create_method_count_tables()
         logging.info("Writing results method counts to db")
         for name, df in dfs.items():
+            # write data to repo
+            date = pd.to_datetime('now').strftime('%Y-%m-%d')
+            df.to_csv(fr"data/method_counts_{name}_date.csv", index=False)
             execute_sql_file(f"method_counts_{name}.sql")
             df.to_sql(
                 name=f"method_counts_{name}",
