@@ -11,8 +11,8 @@ def git_push():
         repo = Repo(".")
         repo.git.add(update=True)
         repo.index.commit(COMMIT_MESSAGE)
-        origin = repo.remote(name='origin')
+        origin = repo.remote(name="origin")
         current_branch = repo.active_branch.name
-        origin.push(refspec=f"master:{current_branch}")
+        origin.push(refspec=current_branch)
     except GitCommandError:
-        print('An error occurred while pushing the code')
+        print("An error occurred while pushing the code")
