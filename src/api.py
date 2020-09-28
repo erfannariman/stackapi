@@ -32,7 +32,7 @@ def get_data():
     """
     has_more = True
     page = 0
-    data = list()
+    data = []
 
     while has_more:
         page += 1

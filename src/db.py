@@ -156,8 +156,13 @@ def export_dfs_to_azure(dfs, method):
     :param method: append or replace data in database.
     :return: uploads the dataframes with the given names to Azure SQL Server.
     """
+    if method == "replace":
+        sql_files = os.listdir(os.path.join("src", "models"))
+        for sql_file in sql_files:
+            logging.info(f"Executing SQL file {sql_file}")
+            execute_sql_file(sql_file)
 
     for name, df in dfs.items():
-        export_data(df=df, name=name, method=method)
+        export_data(df=df, name=name, method="append")
 
     logging.info("finished upload!")
