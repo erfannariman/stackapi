@@ -68,7 +68,7 @@ def get_overlapping_records(df, name):
     :return:  a list of records that are overlapping
     """
 
-    current_db = read_from_database(name, db_engine=auth_azure(), schema="method_usage")
+    current_db = read_from_database(name, db_engine=auth_azure(), schema=SCHEMA)
     overlapping_records = current_db[current_db[f"{name}_id"].isin(df[f"{name}_id"])]
     del_list = overlapping_records.astype(str)[f"{name}_id"].to_list()
 
@@ -82,7 +82,7 @@ def create_sql_delete_stmt(del_list, name):
     :return: SQL statement for deleting the specific records
     """
     sql_list = ", ".join(del_list)
-    sql_stmt = f"DELETE FROM method_usage.pandas_{name} WHERE {name}_id IN ({sql_list})"
+    sql_stmt = f"DELETE FROM {SCHEMA}.pandas_{name} WHERE {name}_id IN ({sql_list})"
     logging.info(f"{len(del_list)} {name} in delete statement")
 
     return sql_stmt
