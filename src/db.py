@@ -130,7 +130,7 @@ def execute_sql_file(sql_file):
 def export_data(df, name, method):
     """
     Write data to database
-    :param df: data set with NEW records (either questions or answers).
+    :param df: data set with NEW records (either questions or create_answers).
     :param name: name of table.
     :param method: append or replace data in database.
     :return: None

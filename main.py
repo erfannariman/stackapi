@@ -16,8 +16,8 @@ def run():
         export_dfs_to_azure(dfs, method="replace")
 
     if settings["run_api"]:
-        dfs = pull_data()
-        export_dfs_to_azure(dfs, method=settings["method"])
+        data = pull_data()
+        export_dfs_to_azure(data.dfs, method=settings["method"])
 
     if settings["method_count"]:
         method_counts = MethodCounts()
