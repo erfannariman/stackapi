@@ -37,11 +37,11 @@ def get_data():
 
     while has_more:
         page += 1
-        json = request_data(page)
-        answers, questions = ParseResponse.parse_json(json)
+        json_data = request_data(page)
+        answers, questions = ParseResponse.parse_json(json_data)
         all_answers = all_answers + answers
         all_questions = all_questions + questions
-        has_more = json["has_more"]
+        has_more = json_data["has_more"]
         logging.info(
             f"pulled {len(all_questions)} questions and {len(all_answers)} create_answers..."
         )
@@ -57,6 +57,8 @@ def request_data(page):
     params = set_parameters(page)
     request = requests.get(BASE_URL, params=params)
     json = request.json()
+
+    logging.info(f"quota_max={json['quota_max']} quota_remaining={json['quota_remaining']}")
 
     return json
 
