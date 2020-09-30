@@ -4,6 +4,7 @@ import pandas as pd
 from src.parse_settings import get_settings
 from sqlalchemy import create_engine
 from sqlalchemy.sql import text
+from datetime import datetime
 
 try:
     settings = get_settings("settings.yml")
@@ -142,10 +143,10 @@ def export_data(df, name, method):
         return logging.info(f"skipped upload of table {name}.(0 records)")
 
     logging.info(f"executing {method} on table '{name}' ({len(df)} records) to Azure")
-    df["date_added"] = pd.to_datetime("now")
+    df["date_added"] = datetime.now()
 
     df.to_sql(
-        name=f"pandas_{name}", con=auth_azure(), if_exists=method, schema=SCHEMA, index=False,
+        name=f"pandas_{name}", con=auth_azure(), if_exists='append', schema=SCHEMA, index=False,
     )
     logging.info(f"finished executing {method}!")
 
@@ -156,8 +157,19 @@ def export_dfs_to_azure(dfs, method):
     :param method: append or replace data in database.
     :return: uploads the dataframes with the given names to Azure SQL Server.
     """
+    if method == "replace":
+        sql_files = os.listdir(os.path.join("src", "models"))
+        for sql_file in sql_files:
+            logging.info(f"Executing SQL file {sql_file}")
+            execute_sql_file(sql_file)
 
     for name, df in dfs.items():
         export_data(df=df, name=name, method=method)
 
     logging.info("finished upload!")
+
+
+def export_dfs_to_pickles(dfs):
+    for name, df in dfs.items():
+        df.to_pickle(os.path.join('data', f"{name}.pkl"))
+    logging.info("finished exporting to .pkl!")

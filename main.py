@@ -2,7 +2,7 @@ from src.api import pull_data
 from src.log import set_logging
 from src.parse_settings import get_settings
 from src.scraper import run_scraper
-from src.db import export_dfs_to_azure
+from src.db import export_dfs_to_azure, export_dfs_to_pickles
 from src.functions import MethodCounts
 from datetime import datetime
 import logging
@@ -17,7 +17,8 @@ def run():
 
     if settings["run_api"]:
         data = pull_data()
-        export_dfs_to_azure(data.dfs, method=settings["method"])
+        #export_dfs_to_azure(data.dfs, method=settings["method"])
+        export_dfs_to_pickles(data.dfs)
 
     if settings["method_count"]:
         method_counts = MethodCounts()
