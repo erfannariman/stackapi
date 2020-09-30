@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS method_usage.pandas_question;
-CREATE TABLE method_usage.pandas_question (
+DROP TABLE IF EXISTS test.pandas_question;
+CREATE TABLE test.pandas_question (
 	question_id INT NOT NULL PRIMARY KEY,
 	tags VARCHAR(255),
 	owner INT NOT NULL,

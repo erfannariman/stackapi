@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS method_usage.method_counts_answer;
-CREATE TABLE method_usage.method_counts_answer (
+DROP TABLE IF EXISTS test.method_counts_answer;
+CREATE TABLE test.method_counts_answer (
     methods varchar(255) not null,
     count int not null,
 	module varchar(255) not null,

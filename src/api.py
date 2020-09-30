@@ -1,43 +1,85 @@
 import requests
 import logging
-from src.functions import MakeDataFrame
+from src.functions import MakeDataFrame, ParseResponse
 from src.parse_settings import get_settings
+import os
 
-tag = get_settings("settings.yml")["module"]
+settings = get_settings("settings.yml")
 BASE_URL = "https://api.stackexchange.com/2.2/questions"
-
-
-def get_data():
-    """
-    Retrieve data from certain tag from stackexchange
-    :return: json with answers and questions
-    """
-
-    params = {
-        "order": "desc",
-        "sort": "creation",
-        "tagged": tag,
-        "site": "stackoverflow",
-        "filter": "!17vW0QCdaXujT5YQflD_sS_8ZjSYTT51wvIeyoJW0JSm4D",
-    }
-
-    request = requests.get(BASE_URL, params=params)
-    json = request.json()
-
-    return json
 
 
 def pull_data():
     """
     Convert json retrieved from API to pandas dataframes.
-    :return: dictionary with answers and questions dataframes.
+    :return: dictionary with create_answers and questions dataframes.
     """
     logging.info("pulling data from Stack API...")
 
-    json = get_data()
-    make_df = MakeDataFrame(json)
-    dfs = make_df.create_dataframes()
-    for name, df in dfs.items():
+    answers, questions = get_data()
+
+    data = MakeDataFrame(questions, answers)
+
+    for name, df in data.dfs.items():
         logging.info(f"imported {name} with {len(df)} records!")
 
-    return dfs
+    return data
+
+
+def get_data():
+    """
+    Retrieve data from certain tag from stackexchange
+    :return: json with create_answers and questions
+    """
+    has_more = True
+    page = 0
+    all_questions = list()
+    all_answers = list()
+
+    while has_more:
+        page += 1
+        json_data = request_data(page)
+        answers, questions = ParseResponse.parse_json(json_data)
+        all_answers = all_answers + answers
+        all_questions = all_questions + questions
+        has_more = json_data["has_more"]
+        logging.info(
+            f"pulled {len(all_questions)} questions and {len(all_answers)} create_answers..."
+        )
+
+        if page == 2:
+            has_more = False
+
+    return all_answers, all_questions
+
+
+def request_data(page):
+
+    params = set_parameters(page)
+    request = requests.get(BASE_URL, params=params)
+    json = request.json()
+
+    logging.info(f"quota_max={json['quota_max']} quota_remaining={json['quota_remaining']}")
+
+    return json
+
+
+def set_parameters(page):
+    params = {
+        "order": "desc",
+        "sort": "creation",
+        "tagged": settings["module"],
+        "site": "stackoverflow",
+        "filter": "!17vW0QCdaXujT5YQflD_sS_8ZjSYTT51wvIeyoJW0JSm4D",
+        "pagesize": "100",
+        "page": str(page),
+    }
+
+    if settings["use_apikey"]:
+        params.update(
+            {
+                "access_token": os.environ.get("STACKEX_ACCESS_TOKEN"),
+                "key": os.environ.get("STACKEX_KEY"),
+            }
+        )
+
+    return params

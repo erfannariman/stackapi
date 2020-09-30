@@ -11,23 +11,31 @@ SCHEMA = settings["schema"]
 MODULE = settings["module"]
 
 
-class MakeDataFrame:
+class ParseResponse:
     def __init__(self, json):
         self.json = json
 
-    def split_json(self):
+    def parse_json(self):
         """
         Split json into questions part and answer part.
         The answer part is a nested JSON itself.
         :return: two lists of dictionaries
         """
-        items = self.json["items"]
+        items = self["items"]
         # we use pop, because we want to
-        # remove answers from the original dictionary
+        # remove create_answers from the original dictionary
         answers = [item.pop("answers", None) for item in items]
         questions = items
 
         return answers, questions
+
+
+class MakeDataFrame:
+    def __init__(self, questions, answers):
+
+        self.answers = answers
+        self.questions = questions
+        self.dfs = self.create_dataframes()
 
     @staticmethod
     def select_string_columns(df):
@@ -47,49 +55,44 @@ class MakeDataFrame:
 
         return df
 
-    def answers(self, answers):
+    def create_answers(self):
         """
-        Create answers dataframe from list of dictionaries
+        Create create_answers dataframe from list of dictionaries
         :param answers: list of dictionaries
         :return: DataFrame
         """
 
-        answers = pd.concat([pd.DataFrame(x) for x in answers], ignore_index=True)
-        answers = self.get_user_id(answers, "owner")
+        df = pd.concat([pd.DataFrame(x) for x in self.answers], ignore_index=True)
+        df = self.get_user_id(df, "owner")
         date_cols = ["last_activity_date", "creation_date", "last_edit_date"]
-        answers[date_cols] = answers[date_cols].apply(
-            lambda x: pd.to_datetime(x, unit="s", utc=True)
-        )
-        answers["body"] = answers.body.str.replace("<[^<]+?>", "")
+        df[date_cols] = df[date_cols].apply(lambda x: pd.to_datetime(x, unit="s", utc=True))
+        df["body"] = df.body.str.replace("<[^<]+?>", "")
 
-        return answers
+        return df
 
-    def questions(self, questions):
+    def create_questions(self):
         """
         Create questions dataframe from list of dictionaries
         :param questions: list of dictionaries
         :return: DataFrame
         """
-        questions = pd.DataFrame(questions)
-        questions = self.get_user_id(questions, "owner")
-        questions["tags"] = questions["tags"].str.join(", ")
+        df = pd.DataFrame(self.questions)
+        df = self.get_user_id(df, "owner")
+        df["tags"] = df["tags"].str.join(", ")
         date_cols = ["last_activity_date", "creation_date", "last_edit_date"]
-        questions[date_cols] = questions[date_cols].apply(
-            lambda x: pd.to_datetime(x, unit="s", utc=True)
-        )
-        questions["body"] = questions.body.str.replace("<[^<]+?>", "")
+        df[date_cols] = df[date_cols].apply(lambda x: pd.to_datetime(x, unit="s", utc=True))
+        df["body"] = df.body.str.replace("<[^<]+?>", "")
 
-        return questions
+        return df
 
     def create_dataframes(self):
         """
-        Create both answers, questions dataframes
-        :return: answers dataframe, questions dataframe
+        Create both create_answers, questions dataframes
+        :return: create_answers dataframe, questions dataframe
         """
-        answers, questions = self.split_json()
         dfs = {
-            "answer": self.answers(answers),
-            "question": self.questions(questions),
+            "answer": self.create_answers(),
+            "question": self.create_questions(),
         }
 
         return dfs

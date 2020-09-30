@@ -13,3 +13,4 @@ module: pandas
 get_pandas_methods: True
 run_api: False
 method_count: True
+use_apikey: False
