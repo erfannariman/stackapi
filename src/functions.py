@@ -84,7 +84,6 @@ class MakeDataFrame:
         df["body"] = df.body.str.replace("<[^<]+?>", "")
 
         return df
-        return df
 
     def create_dataframes(self):
         """
